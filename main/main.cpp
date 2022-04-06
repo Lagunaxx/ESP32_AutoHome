@@ -17,10 +17,14 @@
  * 		TTGO-T-Display (got from  Aliexpress.com)
  *
  */ // ############################################################################
+
 #include "System.h"
 
-TaskHandle_t loopTaskHandle = NULL;
 System *sys;
+
+
+TaskHandle_t loopTaskHandle = NULL;
+//System *sys;
 //Service::FTP::FtpServer ftpSrv;   //set #define FTP_DEBUG in ESP8266FtpServer.h to see ftp verbose on serial
 
 Device::Memory::c_Buffer *testBuffer;
@@ -35,7 +39,7 @@ void setup() {
 
 	sys = new System();
 	testBuffer = new Device::Memory::c_Buffer(2,sizeof(T_DispCoords),10,10);
-	T_DispCoords testValue=11, *testReturn;
+	T_DispCoords ttestValue=11, *testReturn;
 
 	void *testbuf;
 	st_Size2D *pos=new st_Size2D();
@@ -44,40 +48,44 @@ void setup() {
 	Serial.println("\nBuffer test:\n");
 	for (int xx=0;xx<10;xx++) {
 		for (int yy=0;yy<10;yy++) {
-			testBuffer->set(&testValue,xx,yy);
-			Serial.printf("%i\t",(int)testValue);
-			testValue++;
+			testBuffer->set(&ttestValue,xx,yy);
+			Serial.printf("%i\t",(int)ttestValue);
+			ttestValue++;
 		}
 		Serial.print("\n");
 	}
 
 	Serial.print("\n-------\n");
-	pos->width=0;
-	pos->height=0; //+ready
+	pos->width=2;
+	pos->height=3; //+ready
 	szs->width=6;
 	szs->height=5;
 	testbuf=testBuffer->copyBuffer((void*)pos,(void*)szs);
 	Serial.print("\n-------\n");
 	for (int xx=0;xx<szs->width;xx++) {
 		for (int yy=0;yy<szs->height;yy++) {
-			memcpy(&testValue,testbuf+(xx*testBuffer->getUnitSize()+yy*szs->width*testBuffer->getUnitSize()),testBuffer->getUnitSize());
+			memcpy(&ttestValue,testbuf+(xx*testBuffer->getUnitSize()+yy*szs->width*testBuffer->getUnitSize()),testBuffer->getUnitSize());
 			//testBuffer->set(&testValue,xx,yy);
-			Serial.printf("%i\t",(int)testValue);
+			Serial.printf("%i\t",(int)ttestValue);
 		}
 		Serial.print("\n");
 	}
 
-
+// f_srcpos
 	Serial.println("\nEnd Buffer test.\n");
 // */
 	SPIFFS.begin(true);
 	//sys->tft->println("SPIFFS");
 
+#ifdef _BLUETOOTH_SERIAL_H_
 	sys->BTInit();
 	//sys->tft->println("BT");
+#endif
 
+#ifdef WiFiClientSecure_h
 	sys->WFAPInit();
 	//sys->tft->println("WiFi");
+#endif
 
 #ifdef SERVICE_WEB
 	Service::HTTP::Start();
@@ -142,8 +150,13 @@ void loop() {
 
 #endif
 
+#ifdef SERVICE_FTP
 	Service::FTP::Handle();
+#endif
+#ifdef SERVICE_WEB
 	Service::HTTP::Handle();
+#endif
+	delay(10);
 }
 
 //Starting Programm
@@ -159,7 +172,7 @@ void loopTask(void *pvParameters) {
 }
 
 extern "C" void app_main() {
-	loopTaskWDTEnabled = false;
+	loopTaskWDTEnabled = true; //false;
 	initArduino();
 	xTaskCreateUniversal(loopTask, "loopTask", 8192, NULL, 1, &loopTaskHandle,
 			CONFIG_ARDUINO_RUNNING_CORE);

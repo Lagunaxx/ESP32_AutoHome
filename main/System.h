@@ -5,9 +5,15 @@
  *      Author: producer
  */
 
+//********** Activating services **********
+#define SERVICE_FTP			// FTP-server
+//#define SERVICE_WEB		// Web-server
+#define SERVICE_BT			// Bluetooth
+//#define SERVICE_WIFI		// WiFi non-secure. If SERVICE_WIFISEC defined, then secure wifi will be active
+#define SERVICE_WIFISEC		// WiFi secure
 
-#define SERVICE_FTP
-#define SERVICE_WEB
+
+//********** End of services **********
 
 #ifndef MAIN_SYSTEM_H_
 	#define MAIN_SYSTEM_H_
@@ -19,20 +25,15 @@
 	#include "esp_task_wdt.h"
 	#include <Arduino.h>
 	#include <FS.h>
-	#include <BluetoothSerial.h>
-	//#include <WiFi.h>
-	//#include <WiFiClient.h>
-	#include <WiFiClientSecure.h>
-//	#include <ESPmDNS.h>
-	//#include "tftprint.cpp"
-	//#include "Free_Fonts.cpp"
-//	#include "../components/arduino/libraries/TFT_eSPI/ESP32-SPIDisplay.h" // Graphics and font library
-#include <ESP32_SPIDisplay.h>
-#include <Extensions/Graphics.h>
-#include <Extensions/Touch.h>
-#include <Extensions/Font/Font.h>
+	#include "ESP32_SPIDisplay.h"
+	#include "Graphics.h"
+	#include "Touch.h"
 
-#include <Extensions/cBuffer.h>
+#include "Font.h"
+
+	#include "Types.h"
+
+	#include "Extensions/cBuffer.h"
 
 //	#include <SPI.h>
 //	#include <ESPmDNS.h>
@@ -45,9 +46,26 @@
 		#include "WebService.h"
 	#endif
 
+	#ifdef SERVICE_BT
+		#include <BluetoothSerial.h>
+	#endif
+
+	#ifdef SERVICE_WIFISEC
+		#include <WiFiClientSecure.h>
+	#else
+		#ifdef SERVICE_WIFI
+			#include <WiFi.h>
+			#include <WiFiClient.h>
+		#endif
+	#endif
+
 	#define TFT_GREY 0x5AEB // New colour
 
 #include "upng.h"
+
+using Device::Display::Graphics::Graph;
+using Device::Display::uPNG::uPNG;
+using namespace Device::Display;
 
 class System {
 
@@ -56,65 +74,52 @@ class System {
 			#ifdef _BLUETOOTH_SERIAL_H_
 				#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 					#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+				#else
+					BluetoothSerial SerialBT;
 				#endif
-				BluetoothSerial SerialBT;
 			#endif
 
 			#ifdef WiFiClientSecure_h
 				WiFiClientSecure WiFi_client;
 			#endif
-				Device::Display::Graphics::Graphics *Graph;
 				Device::Display::Graphics::Font *Fonts;
-				upng_t* upng;
+//				upng_t* upng;
 
 		public:
 			#ifdef _BLUETOOTH_SERIAL_H_
 				#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 					#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+				#else
+
+					void BTInit();
+
+					bool BTbegin(String);
+					int BTavailable(void);
+					int BTpeek(void);
+					bool BThasClient(void);
+					int BTread(void);
+					size_t BTwrite(uint8_t c);
+					size_t BTwrite(const uint8_t *buffer, size_t size);
+					void BTflush();
+					void BTend(void);
+					esp_err_t BTregister_callback(esp_spp_cb_t * callback);
+
 				#endif
 
-				void BTInit();
-
-				bool BTbegin(String);
-				int BTavailable(void);
-				int BTpeek(void);
-				bool BThasClient(void);
-				int BTread(void);
-				size_t BTwrite(uint8_t c);
-				size_t BTwrite(const uint8_t *buffer, size_t size);
-				void BTflush();
-				void BTend(void);
-				esp_err_t BTregister_callback(esp_spp_cb_t * callback);
-
-				//#include "../modules/Bluetooth.h"
 			#endif
 
 			#ifdef WiFiClientSecure_h
 				void WFAPInit();
-				//bool WFScan();
-				//bool WFConnect(const char*, const char *, int32_t , const uint8_t*, bool );//const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid, bool connect
-				//wl_status_t WFStatus();
 				IPAddress WFlocalIP();
-			//	#include "../modules/WiFiClient.h"
 			#endif
 
 
-			#ifdef WEBSERVER_H
-				//#include "../modules/HTTP_Server.h
-
-			#endif
-
-			#ifdef FTP_SERVERESP_H
-				//Service::FTP::FtpServer *FTP_Server;
-			#endif
 				void DrawPng();
 
 		System();
 		virtual ~System();
 
 		//void InitFS();
-
-
 
 	};
 

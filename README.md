@@ -1,8 +1,11 @@
-# ESP32-AutoHome
----
+ESP-IDF template app
+====================
 
-Automation system for home use for ESP32 boards
+This is a template application to be used with [Espressif IoT Development Framework](https://github.com/espressif/esp-idf).
 
-Due project start line - now working on principles of code organization. First of all making nessasery blocks of codes to make a build. System will be consists from modules that will be able to configure through make menuconfig (later).
+Please check [ESP-IDF docs](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for getting started instructions.
 
-Now (01.oct.2019) simple wifi+Bluetooth connections evalable, Simple filesystem SPIFFS, WEB-access and FTP-access tested.
+*Code in this repository is in the Public Domain (or CC0 licensed, at your option.)
+Unless required by applicable law or agreed to in writing, this
+software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied.*

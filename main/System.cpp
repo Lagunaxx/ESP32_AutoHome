@@ -6,17 +6,19 @@
  */
 
 #include "System.h"
-//using Device::Display::Graphics::Graph;
+
 System::System() {
 	// TODO Auto-generated constructor stub
 #ifdef FTP_SERVERESP_H
 	//FTP_Server = new Service::FTP::FtpServer();
-	upng = 0;
+//	upng = 0;
 #endif
 	Device::Display::init();
-	Graph=new Device::Display::Graphics::Graphics();
-	Graph->fillScreen(TFT_BLUE);
+	Device::Display::Graphics::init(TFT_BLUE);
+	//Graph=new Device::Display::Graphics::Graphics();
+	//Graph->fillScreen(TFT_BLUE);
 	Fonts=new Device::Display::Graphics::Font();
+	Fonts->setTextColor(0x000000);
 	//Fonts->Cursor();
 
 }
@@ -24,7 +26,7 @@ System::System() {
 System::~System() {
 	// TODO Auto-generated destructor stub
 	//delete (tft);
-//	Device::Display::remove();
+	Device::Display::remove();
 }
 
 #ifdef _BLUETOOTH_SERIAL_H_
@@ -108,15 +110,31 @@ IPAddress System::WFlocalIP() {
 
 void System::DrawPng() {
 	Serial.printf("\nstart draw\n");
-	unsigned width, height;
-	uint16_t* tmpbuffer;
-	uint8_t* tmpalpha;
-	int alphas;
-	uint32_t tmp;
-	const char *filenames[2] = { "/24wifi.png", "/t.png"};
-	int maxfiles = 2, last_y = 0;
+//	unsigned width, height;
+//	uint16_t* tmpbuffer;
+//	uint8_t* tmpalpha;
+//	int alphas;
+//	uint32_t tmp;
+	int maxfiles = 1, last_y = 0;
+	char *filenames[maxfiles] = { "/t.png"};//, "/24wifi.png", "/t.png"};
 	char xx = 0, yy = 0;
 	for (int numfiles = 0; numfiles < maxfiles; numfiles++) {
+		Device::Display::uPNG::uPNG->DrawFile(filenames[numfiles], 100, 100);
+		//Fonts->setFreeFont(&Device::Display::Graphics::FreeMono9pt7b);
+		//Fonts->setTextFont(1);
+		//Fonts->drawGlyph((uint16_t)'x', 20, 25);
+		Fonts->setTextColor(TFT_WHITE, TFT_BLUE);
+		Fonts->setTextSize(2);
+		Fonts->drawChar((uint16_t)L'y', 2, 15, 1);
+		Fonts->drawChar((uint16_t)L'p', 22, 15, 1);
+		Fonts->drawChar((uint16_t)L'd', 42, 15, 1);
+		Fonts->drawChar((uint16_t)L'B', 62, 15, 1);
+		Fonts->drawChar((uint16_t)L'x', 82, 15, 1);
+
+		Serial.printf("\nCompare t_color=%u VS upng=%u\n",sizeof(Device::Display::Graphics::t_color_r8g8b8a8),sizeof(upng_s_rgba32b));
+
+
+/* Old testing code. remove it
 
 		upng = upng_new_from_file(filenames[numfiles]);
 		if (upng_get_error(upng) == UPNG_ENOTFOUND) {
@@ -168,7 +186,7 @@ void System::DrawPng() {
 
 			upng_free(upng);
 		}
-
+remove to here */
 	}
 }
 
