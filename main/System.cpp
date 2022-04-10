@@ -118,20 +118,41 @@ void System::DrawPng() {
 	int maxfiles = 1, last_y = 0;
 	char *filenames[maxfiles] = { "/t.png"};//, "/24wifi.png", "/t.png"};
 	char xx = 0, yy = 0;
+	const char *string = "heloo!";
+	T_DispCoords hbox = 53;
+
 	for (int numfiles = 0; numfiles < maxfiles; numfiles++) {
+#ifdef GRAPH_PNG
 		Device::Display::uPNG::uPNG->DrawFile(filenames[numfiles], 100, 100);
+#endif
 		//Fonts->setFreeFont(&Device::Display::Graphics::FreeMono9pt7b);
 		//Fonts->setTextFont(1);
 		//Fonts->drawGlyph((uint16_t)'x', 20, 25);
+		Fonts->setTextFont(2);
 		Fonts->setTextColor(TFT_WHITE, TFT_BLUE);
+		Fonts->setTextSize(4);
+		Fonts->drawChar((uint16_t)L'y', 2, 15);
+		Fonts->setTextColor(TFT_WHITE, TFT_BLACK);
+		Fonts->setTextSize(3);
+		Fonts->drawChar((uint16_t)L'X', 4, 15);
+		Fonts->setTextColor(TFT_DARKGREEN, TFT_BLUE);
 		Fonts->setTextSize(2);
-		Fonts->drawChar((uint16_t)L'y', 2, 15, 1);
-		Fonts->drawChar((uint16_t)L'p', 22, 15, 1);
-		Fonts->drawChar((uint16_t)L'd', 42, 15, 1);
-		Fonts->drawChar((uint16_t)L'B', 62, 15, 1);
-		Fonts->drawChar((uint16_t)L'x', 82, 15, 1);
+		Fonts->drawChar((uint16_t)L'y', 5, 15);
+		Fonts->drawString(string,52,100);
+		Graph->drawFastHLine(52, 100, hbox, TFT_WHITE);
+		Graph->drawFastHLine(52, 130, hbox, TFT_WHITE);
+		Graph->drawFastVLine(52, 100, 30, TFT_WHITE);
+		Graph->drawFastVLine(52+hbox, 100, 30, TFT_WHITE);
 
-		Serial.printf("\nCompare t_color=%u VS upng=%u\n",sizeof(Device::Display::Graphics::t_color_r8g8b8a8),sizeof(upng_s_rgba32b));
+		Fonts->drawNumber((long int)Fonts->textWidthFit(string,2,hbox), 52, 150);
+
+//		Fonts->drawChar((uint16_t)L'y', 2, 15, 1);
+//		Fonts->drawChar((uint16_t)L'p', 22, 15, 1);
+//		Fonts->drawChar((uint16_t)L'd', 42, 15, 1);
+//		Fonts->drawChar((uint16_t)L'B', 62, 15, 1);
+//		Fonts->drawChar((uint16_t)L'x', 82, 15, 1);
+
+//		Serial.printf("\nCompare t_color=%u VS upng=%u\n",sizeof(Device::Display::Graphics::t_color_r8g8b8a8),sizeof(upng_s_rgba32b));
 
 
 /* Old testing code. remove it

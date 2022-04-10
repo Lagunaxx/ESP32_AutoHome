@@ -33,6 +33,8 @@ Device::Memory::c_Buffer *testBuffer;
 
 bool loopTaskWDTEnabled;
 
+using Device::Display::Graphics::t_Size2D;
+
 void setup() {
 
 	Serial.begin(115200);
@@ -42,8 +44,8 @@ void setup() {
 	T_DispCoords ttestValue=11, *testReturn;
 
 	void *testbuf;
-	st_Size2D *pos=new st_Size2D();
-	st_Size2D *szs = new st_Size2D();
+	t_Size2D *pos=new t_Size2D();
+	t_Size2D *szs = new t_Size2D();
 
 	Serial.println("\nBuffer test:\n");
 	for (int xx=0;xx<10;xx++) {

@@ -6,11 +6,11 @@
  */
 
 //********** Activating services **********
-#define SERVICE_FTP			// FTP-server
+//#define SERVICE_FTP			// FTP-server
 //#define SERVICE_WEB		// Web-server
-#define SERVICE_BT			// Bluetooth
+//#define SERVICE_BT			// Bluetooth
 //#define SERVICE_WIFI		// WiFi non-secure. If SERVICE_WIFISEC defined, then secure wifi will be active
-#define SERVICE_WIFISEC		// WiFi secure
+//#define SERVICE_WIFISEC		// WiFi secure
 
 
 //********** End of services **********
@@ -61,10 +61,12 @@
 
 	#define TFT_GREY 0x5AEB // New colour
 
-#include "upng.h"
+#ifdef GRAPH_PNG
+	#include "upng.h"
+	using Device::Display::uPNG::uPNG;
+#endif
 
 using Device::Display::Graphics::Graph;
-using Device::Display::uPNG::uPNG;
 using namespace Device::Display;
 
 class System {
@@ -83,7 +85,6 @@ class System {
 				WiFiClientSecure WiFi_client;
 			#endif
 				Device::Display::Graphics::Font *Fonts;
-//				upng_t* upng;
 
 		public:
 			#ifdef _BLUETOOTH_SERIAL_H_
