@@ -7,6 +7,8 @@
 
 #include "System.h"
 
+
+
 System::System() {
 	// TODO Auto-generated constructor stub
 #ifdef FTP_SERVERESP_H
@@ -19,6 +21,8 @@ System::System() {
 	//Graph->fillScreen(TFT_BLUE);
 	Fonts=new Device::Display::Graphics::Font();
 	Fonts->setTextColor(0x000000);
+	text=new(TextBlock);
+
 	//Fonts->Cursor();
 
 }
@@ -26,7 +30,9 @@ System::System() {
 System::~System() {
 	// TODO Auto-generated destructor stub
 	//delete (tft);
+	//~text();
 	Device::Display::remove();
+
 }
 
 #ifdef _BLUETOOTH_SERIAL_H_
@@ -118,42 +124,74 @@ void System::DrawPng() {
 	int maxfiles = 1, last_y = 0;
 	char *filenames[maxfiles] = { "/t.png"};//, "/24wifi.png", "/t.png"};
 	char xx = 0, yy = 0;
-	const char *string = "heloo!";
-	T_DispCoords hbox = 53;
+	const char *string = "bhe";
+	const char *texttext = "hblahblah that is fun, that text do not fit all blocxk. and errors in text";
+	t_DispCoords hbox = 53;
+	Device::Display::Graphics::t_Coordinate2D 	boxcords;
+	Device::Display::Graphics::t_Size2D			boxsize;
+	Device::Display::Graphics::t_color_r8g8b8	fgcolor,
+												bgcolor;
+	fgcolor.r=255;
+	fgcolor.g=255;
+	fgcolor.b=255;
+	bgcolor.r=0;
+	bgcolor.g=0;
+	bgcolor.b=255;
+
+	boxcords.x = 5;
+	boxcords.y = 20;
+	boxsize.width = 85;
+	boxsize.height = 110;
+
+//	text->setTextBlock((t_DispCoords)5, (t_DispCoords)5, (t_DispCoords)70, (t_DispCoords)250,
+//			fgcolor, bgcolor,
+//			(uint8_t)2, (t_DispCoords)1, (t_DispCoords)1);
+
+	text->setBGColor(bgcolor);
+	text->setFGColor(fgcolor);
+	text->setPosition(boxcords.x, boxcords.y);
+	text->setSize(boxsize.width, boxsize.height);
+	text->setLineSpace(3);
+	text->setSymbolSpace(2);
+
+	Graph->drawFastHLine(boxcords.x, boxcords.y, boxsize.width, TFT_WHITE);
+	Graph->drawFastHLine(boxcords.x, boxcords.y + boxsize.height, boxsize.width, TFT_WHITE);
+	Graph->drawFastVLine(boxcords.x, boxcords.y, boxsize.height, TFT_WHITE);
+	Graph->drawFastVLine(boxcords.x + boxsize.width, boxcords.y, boxsize.height, TFT_WHITE);
+
+
+	text->setText("  hblahblah   that is fun, that text do not fit all blocxk. and errors in text");
 
 	for (int numfiles = 0; numfiles < maxfiles; numfiles++) {
 #ifdef GRAPH_PNG
-		Device::Display::uPNG::uPNG->DrawFile(filenames[numfiles], 100, 100);
+		Device::Display::uPNG::uPNG->DrawFile(filenames[numfiles], boxsize.width + 2, 100);
 #endif
 		//Fonts->setFreeFont(&Device::Display::Graphics::FreeMono9pt7b);
 		//Fonts->setTextFont(1);
 		//Fonts->drawGlyph((uint16_t)'x', 20, 25);
-		Fonts->setTextFont(2);
+/*		Fonts->setTextFont(2);
 		Fonts->setTextColor(TFT_WHITE, TFT_BLUE);
 		Fonts->setTextSize(4);
-		Fonts->drawChar((uint16_t)L'y', 2, 15);
+		Fonts->drawChar((uint16_t)'y', (t_DispCoords)2, (t_DispCoords)45);
 		Fonts->setTextColor(TFT_WHITE, TFT_BLACK);
 		Fonts->setTextSize(3);
-		Fonts->drawChar((uint16_t)L'X', 4, 15);
+		Fonts->drawChar((uint16_t)'X', 4, 45);
 		Fonts->setTextColor(TFT_DARKGREEN, TFT_BLUE);
 		Fonts->setTextSize(2);
-		Fonts->drawChar((uint16_t)L'y', 5, 15);
-		Fonts->drawString(string,52,100);
-		Graph->drawFastHLine(52, 100, hbox, TFT_WHITE);
-		Graph->drawFastHLine(52, 130, hbox, TFT_WHITE);
-		Graph->drawFastVLine(52, 100, 30, TFT_WHITE);
-		Graph->drawFastVLine(52+hbox, 100, 30, TFT_WHITE);
+		Fonts->drawChar((uint16_t)'y', 5, 33);
+// 		Fonts->drawString(texttext,52,100);
 
 		Fonts->drawNumber((long int)Fonts->textWidthFit(string,2,hbox), 52, 150);
 
-//		Fonts->drawChar((uint16_t)L'y', 2, 15, 1);
-//		Fonts->drawChar((uint16_t)L'p', 22, 15, 1);
-//		Fonts->drawChar((uint16_t)L'd', 42, 15, 1);
-//		Fonts->drawChar((uint16_t)L'B', 62, 15, 1);
-//		Fonts->drawChar((uint16_t)L'x', 82, 15, 1);
-
-//		Serial.printf("\nCompare t_color=%u VS upng=%u\n",sizeof(Device::Display::Graphics::t_color_r8g8b8a8),sizeof(upng_s_rgba32b));
-
+*/		Serial.printf("Text->Draw()\n");
+		text->setTextFont(2);
+		text->setTextColor(TFT_WHITE,TFT_BLUE);
+		text->setTextSize(1);
+		text->setMoveWholeWord(true);
+		text->setSkipFistSpace(true);
+//		text->drawString(string, 2, 2);
+//		Fonts->drawNumber((long int)text->textWidthFit(string,2,hbox), 52, 180);
+		text->Draw();
 
 /* Old testing code. remove it
 

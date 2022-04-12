@@ -40,8 +40,8 @@ void setup() {
 	Serial.begin(115200);
 
 	sys = new System();
-	testBuffer = new Device::Memory::c_Buffer(2,sizeof(T_DispCoords),10,10);
-	T_DispCoords ttestValue=11, *testReturn;
+	testBuffer = new Device::Memory::c_Buffer(2,sizeof(t_DispCoords),10,10);
+	t_DispCoords ttestValue=11, *testReturn;
 
 	void *testbuf;
 	t_Size2D *pos=new t_Size2D();

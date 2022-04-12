@@ -34,6 +34,7 @@
 	#include "Types.h"
 
 	#include "Extensions/cBuffer.h"
+	#include "Extensions/TextBlock.h"
 
 //	#include <SPI.h>
 //	#include <ESPmDNS.h>
@@ -68,6 +69,7 @@
 
 using Device::Display::Graphics::Graph;
 using namespace Device::Display;
+using Device::Display::Graphics::TextBlock;
 
 class System {
 
@@ -121,7 +123,7 @@ class System {
 		virtual ~System();
 
 		//void InitFS();
-
+		TextBlock *text;
 	};
 
 #endif /* MAIN_SYSTEM_H_ */

@@ -33,3 +33,5 @@
 
 build/*
 components/*
+esp_idf_components/*
+/build/
