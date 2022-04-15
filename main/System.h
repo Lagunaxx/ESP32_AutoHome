@@ -35,6 +35,7 @@
 
 	#include "Extensions/cBuffer.h"
 	#include "Extensions/TextBlock.h"
+	#include "Extensions/Hardware/Hardware.h"
 
 //	#include <SPI.h>
 //	#include <ESPmDNS.h>
@@ -125,5 +126,8 @@ class System {
 		//void InitFS();
 		TextBlock *text;
 	};
+
+
+void handler(Device::Hardware::t_Data * data); //defining by user for Hardware usage
 
 #endif /* MAIN_SYSTEM_H_ */

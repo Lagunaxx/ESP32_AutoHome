@@ -17,6 +17,9 @@ System::System() {
 #endif
 	Device::Display::init();
 	Device::Display::Graphics::init(TFT_BLUE);
+	Device::Hardware::init();
+	Device::Hardware::Bus->addDI(GPIO35, &handler);
+Serial.printf("init handler = %u\n", (unsigned int)&handler);
 	//Graph=new Device::Display::Graphics::Graphics();
 	//Graph->fillScreen(TFT_BLUE);
 	Fonts=new Device::Display::Graphics::Font();
@@ -115,12 +118,10 @@ IPAddress System::WFlocalIP() {
 #endif
 
 void System::DrawPng() {
+
+
+
 	Serial.printf("\nstart draw\n");
-//	unsigned width, height;
-//	uint16_t* tmpbuffer;
-//	uint8_t* tmpalpha;
-//	int alphas;
-//	uint32_t tmp;
 	int maxfiles = 1, last_y = 0;
 	char *filenames[maxfiles] = { "/t.png"};//, "/24wifi.png", "/t.png"};
 	char xx = 0, yy = 0;
@@ -142,10 +143,6 @@ void System::DrawPng() {
 	boxcords.y = 20;
 	boxsize.width = 85;
 	boxsize.height = 110;
-
-//	text->setTextBlock((t_DispCoords)5, (t_DispCoords)5, (t_DispCoords)70, (t_DispCoords)250,
-//			fgcolor, bgcolor,
-//			(uint8_t)2, (t_DispCoords)1, (t_DispCoords)1);
 
 	text->setBGColor(bgcolor);
 	text->setFGColor(fgcolor);
@@ -193,59 +190,12 @@ void System::DrawPng() {
 //		Fonts->drawNumber((long int)text->textWidthFit(string,2,hbox), 52, 180);
 		text->Draw();
 
-/* Old testing code. remove it
-
-		upng = upng_new_from_file(filenames[numfiles]);
-		if (upng_get_error(upng) == UPNG_ENOTFOUND) {
-			Serial.print("file not found");
-		}
-		upng_decode(upng);
-
-		if (upng_get_error(upng) != UPNG_EOK) {
-			Serial.printf("error: %u %u\n", upng_get_error(upng),
-					upng_get_error_line(upng));
-			//return 0;pixel=%i
-		} else {
-
-			width = upng_get_width(upng);
-			height = upng_get_height(upng);
-
-			tmpbuffer=colorBuffer_R8G8B8toR5G6B5(upng);
-			Graph->drawImageBuffer(0,yy,tmpbuffer,width, height); yy+=height+5;//ToDo: make buffer converting
-
-			tmpalpha=colorBuffer_A8R8G8B8toA8(upng);
-			//alphas=upng_get_alpha( upng,  &tmpalpha);
-			//Serial.printf("\nAlphas=%i",alphas);
-			Graph->drawImageBufferAlpha(100,100,tmpbuffer,tmpalpha,width, height);// yy+=height+5;//ToDo: make buffer converting
-			free(tmpalpha);
-
-			free(tmpbuffer);
-
-			switch (upng_get_components(upng)) {
-			case 1: //UPNG_LUM
-				//glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, upng_get_width(upng), upng_get_height(upng), 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, upng_get_buffer(upng));
-				break;
-			case 2:			//UPNG_LUMA
-							//glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, upng_get_width(upng), upng_get_height(upng), 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, upng_get_buffer(upng));
-				break;
-			case 3:			//UPNG_RGB
-							//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, upng_get_width(upng), upng_get_height(upng), 0, GL_RGB, GL_UNSIGNED_BYTE, upng_get_buffer(upng));
-				break;
-			case 4:			//UPNG_RGBA
-							//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, upng_get_width(upng), upng_get_height(upng), 0, GL_RGBA, GL_UNSIGNED_BYTE, upng_get_buffer(upng));
-				break;
-			case 5: //UPNG_PAL
-				break;
-			default: //0 or any else
-				break;
-				//return 1;
-			}
-
-			//free(buffer); do not need to free here, upng_free removes buffer
-
-			upng_free(upng);
-		}
-remove to here */
 	}
+}
+
+void handler(Device::Hardware::t_Data * data){
+	// test hardware
+	int rvalue;
+	rvalue = (int)(*(int *)data->data);
 }
 

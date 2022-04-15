@@ -158,6 +158,7 @@ void loop() {
 #ifdef SERVICE_WEB
 	Service::HTTP::Handle();
 #endif
+	Device::Hardware::Bus->run(); // ToDo: make Handle() like in FTP and HTTP
 	delay(10);
 }
 
