@@ -123,11 +123,18 @@ class System {
 		System();
 		virtual ~System();
 
+
+
+		handler_type handler(Device::Hardware::t_Data * data); //defining by user for Hardware usage
+		handler_type hGraphics(Device::Display::Graphics::t_Graphics * data);
 		//void InitFS();
-		TextBlock *text;
+
 	};
 
 
-void handler(Device::Hardware::t_Data * data); //defining by user for Hardware usage
+
+
+
+
 
 #endif /* MAIN_SYSTEM_H_ */

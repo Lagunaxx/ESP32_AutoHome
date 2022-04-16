@@ -7,6 +7,9 @@
 
 #include "System.h"
 
+		TextBlock *text;
+		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext;
+		Device::Display::Graphics::t_Graphics *hGraph;
 
 
 System::System() {
@@ -17,14 +20,27 @@ System::System() {
 #endif
 	Device::Display::init();
 	Device::Display::Graphics::init(TFT_BLUE);
+	hGraph = new(Device::Display::Graphics::t_Graphics);
+	hGraph->ID=220;
+	hGraph->position.x=5;
+	hGraph->position.y=20;
+	hGraph->size.width=85;
+	hGraph->size.height=110;
+	hGraph->callbackHandler=&System::hGraphics;
+	Graph->registerHandler(hGraph);
+
 	Device::Hardware::init();
-	Device::Hardware::Bus->addDI(GPIO35, &handler);
-Serial.printf("init handler = %u\n", (unsigned int)&handler);
+	Device::Hardware::Bus->addDI(GPIO35, &System::handler);
+	Device::Hardware::Bus->addDI(GPIO0, &System::handler);
+Serial.printf("init handler = %u\n", (unsigned int)&System::handler);
 	//Graph=new Device::Display::Graphics::Graphics();
 	//Graph->fillScreen(TFT_BLUE);
 	Fonts=new Device::Display::Graphics::Font();
 	Fonts->setTextColor(0x000000);
 	text=new(TextBlock);
+	HW_DI_lastvalue_GPIO0=1;
+	HW_DI_lastvalue_GPIO35=1;
+	postext = 0;
 
 	//Fonts->Cursor();
 
@@ -122,7 +138,7 @@ void System::DrawPng() {
 
 
 	Serial.printf("\nstart draw\n");
-	int maxfiles = 1, last_y = 0;
+	int maxfiles = 1;
 	char *filenames[maxfiles] = { "/t.png"};//, "/24wifi.png", "/t.png"};
 	char xx = 0, yy = 0;
 	const char *string = "bhe";
@@ -193,9 +209,44 @@ void System::DrawPng() {
 	}
 }
 
-void handler(Device::Hardware::t_Data * data){
+void System::handler(Device::Hardware::t_Data * data){
 	// test hardware
-	int rvalue;
+	int rvalue=0;
 	rvalue = (int)(*(int *)data->data);
+
+	if (data->pin == GPIO35){
+
+		if(rvalue != HW_DI_lastvalue_GPIO35){
+			if(rvalue==0){
+				postext++;//else postext--;
+
+				Graph->fillRect(hGraph->position.x, hGraph->position.y, hGraph->size.width, hGraph->size.height, TFT_BLUE);
+				Graph->redraw(hGraph);
+				text->Draw(0,postext);
+			}
+		}
+		HW_DI_lastvalue_GPIO35=rvalue;
+	}
+	if (data->pin == GPIO0){
+
+		if(rvalue != HW_DI_lastvalue_GPIO0){
+			if(rvalue==0){
+				postext--;//else postext--;
+
+				Graph->fillRect(hGraph->position.x, hGraph->position.y, hGraph->size.width, hGraph->size.height, TFT_BLUE);
+				Graph->redraw(hGraph);
+				text->Draw(0,postext);
+			}
+		}
+		HW_DI_lastvalue_GPIO0=rvalue;
+
+	}
+
+
+
+}
+
+void System::hGraphics(Device::Display::Graphics::t_Graphics * data) {
+
 }
 

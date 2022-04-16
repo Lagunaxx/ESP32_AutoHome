@@ -64,8 +64,8 @@ void setup() {
 	szs->height=5;
 	testbuf=testBuffer->copyBuffer((void*)pos,(void*)szs);
 	Serial.print("\n-------\n");
-	for (int xx=0;xx<szs->width;xx++) {
-		for (int yy=0;yy<szs->height;yy++) {
+	for (int yy=0;yy<szs->height;yy++) {
+		for (int xx=0;xx<szs->width;xx++) {
 			memcpy(&ttestValue,testbuf+(xx*testBuffer->getUnitSize()+yy*szs->width*testBuffer->getUnitSize()),testBuffer->getUnitSize());
 			//testBuffer->set(&testValue,xx,yy);
 			Serial.printf("%i\t",(int)ttestValue);
@@ -158,7 +158,7 @@ void loop() {
 #ifdef SERVICE_WEB
 	Service::HTTP::Handle();
 #endif
-	Device::Hardware::Bus->run(); // ToDo: make Handle() like in FTP and HTTP
+	Device::Hardware::Handle(); //Bus->run(); // ToDo: make Handle() like in FTP and HTTP
 	delay(10);
 }
 
