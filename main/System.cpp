@@ -8,8 +8,11 @@
 #include "System.h"
 
 		TextBlock *text;
+		TextBlock *AItext;
+		TextBlock *DItext;
 		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext;
-		Device::Display::Graphics::t_Graphics *hGraph;
+		Device::Display::Graphics::t_Graphics *hGraph1, *hGraph2, *hGraph3;
+		uint8_t Ghand1, Ghand2, Ghand3;
 
 
 System::System() {
@@ -20,29 +23,44 @@ System::System() {
 #endif
 	Device::Display::init();
 	Device::Display::Graphics::init(TFT_BLUE);
-	hGraph = new(Device::Display::Graphics::t_Graphics);
-	hGraph->ID=220;
-	hGraph->position.x=5;
-	hGraph->position.y=20;
-	hGraph->size.width=85;
-	hGraph->size.height=110;
-	hGraph->callbackHandler=&System::hGraphics;
-	Graph->registerHandler(hGraph);
+	hGraph1 = new(Device::Display::Graphics::t_Graphics);
+	hGraph2 = new(Device::Display::Graphics::t_Graphics);
+	hGraph3 = new(Device::Display::Graphics::t_Graphics);
+	hGraph1->ID=220;
+	hGraph1->position.x=5;
+	hGraph1->position.y=20;
+	hGraph1->size.width=85;
+	hGraph1->size.height=110;
+	hGraph1->callbackHandler=&System::hGraphics;
+	Ghand1 = Graph->registerHandler(hGraph1); // For GPIO35 and GPIO0
+	hGraph2->position.x=10;
+	hGraph2->position.y=130;
+	hGraph2->size.width=85;
+	hGraph2->size.height=16;
+	hGraph2->callbackHandler=&System::hGraphics;
+	Ghand2= Graph->registerHandler(hGraph2); // For GPIO26
+	hGraph3->position.x=10;
+	hGraph3->position.y=150;
+	hGraph3->size.width=85;
+	hGraph3->size.height=16;
+	hGraph3->callbackHandler=&System::hGraphics;
+	Ghand3 = Graph->registerHandler(hGraph3); // For GPIO27
 
 	Device::Hardware::init();
+
 	Device::Hardware::Bus->addDI(GPIO35, &System::handler);
 	Device::Hardware::Bus->addDI(GPIO0, &System::handler);
-Serial.printf("init handler = %u\n", (unsigned int)&System::handler);
-	//Graph=new Device::Display::Graphics::Graphics();
-	//Graph->fillScreen(TFT_BLUE);
+	Device::Hardware::Bus->addDI(GPIO26, &System::handler);
+	Device::Hardware::Bus->addAI(GPIO27, &System::handler);
+
 	Fonts=new Device::Display::Graphics::Font();
 	Fonts->setTextColor(0x000000);
 	text=new(TextBlock);
+	AItext=new(TextBlock);
+	DItext=new(TextBlock);
 	HW_DI_lastvalue_GPIO0=1;
 	HW_DI_lastvalue_GPIO35=1;
 	postext = 0;
-
-	//Fonts->Cursor();
 
 }
 
@@ -140,10 +158,10 @@ void System::DrawPng() {
 	Serial.printf("\nstart draw\n");
 	int maxfiles = 1;
 	char *filenames[maxfiles] = { "/t.png"};//, "/24wifi.png", "/t.png"};
-	char xx = 0, yy = 0;
-	const char *string = "bhe";
-	const char *texttext = "hblahblah that is fun, that text do not fit all blocxk. and errors in text";
-	t_DispCoords hbox = 53;
+	//char xx = 0, yy = 0;
+	//const char *string = "bhe";
+	//const char *texttext = "hblahblah that is fun, that text do not fit all blocxk. and errors in text";
+	//t_DispCoords hbox = 53;
 	Device::Display::Graphics::t_Coordinate2D 	boxcords;
 	Device::Display::Graphics::t_Size2D			boxsize;
 	Device::Display::Graphics::t_color_r8g8b8	fgcolor,
@@ -166,6 +184,36 @@ void System::DrawPng() {
 	text->setSize(boxsize.width, boxsize.height);
 	text->setLineSpace(3);
 	text->setSymbolSpace(2);
+
+
+	AItext->setBGColor(bgcolor);
+	AItext->setFGColor(fgcolor);
+	AItext->setPosition(hGraph2->position.x, hGraph2->position.y);
+	AItext->setSize(hGraph2->size.width, hGraph2->size.height);
+	AItext->setLineSpace(3);
+	AItext->setSymbolSpace(2);
+	AItext->setTextFont(2);
+	AItext->setTextColor(TFT_WHITE,TFT_BLUE);
+	AItext->setTextSize(1);
+	AItext->setMoveWholeWord(true);
+	AItext->setSkipFistSpace(true);
+	AItext->setText("N\\A");
+	AItext->Draw();
+
+	DItext->setBGColor(bgcolor);
+	DItext->setFGColor(fgcolor);
+	DItext->setPosition(hGraph3->position.x, hGraph3->position.y);
+	DItext->setSize(hGraph3->size.width, hGraph3->size.height);
+	DItext->setLineSpace(3);
+	DItext->setSymbolSpace(2);
+	DItext->setTextFont(2);
+	DItext->setTextColor(TFT_WHITE,TFT_BLUE);
+	DItext->setTextSize(1);
+	DItext->setMoveWholeWord(true);
+	DItext->setSkipFistSpace(true);
+	DItext->setText("N\\A");
+	DItext->Draw();
+
 
 	Graph->drawFastHLine(boxcords.x, boxcords.y, boxsize.width, TFT_WHITE);
 	Graph->drawFastHLine(boxcords.x, boxcords.y + boxsize.height, boxsize.width, TFT_WHITE);
@@ -220,8 +268,9 @@ void System::handler(Device::Hardware::t_Data * data){
 			if(rvalue==0){
 				postext++;//else postext--;
 
-				Graph->fillRect(hGraph->position.x, hGraph->position.y, hGraph->size.width, hGraph->size.height, TFT_BLUE);
-				Graph->redraw(hGraph);
+				Graph->fillRect(hGraph1->position.x, hGraph1->position.y, hGraph1->size.width, hGraph1->size.height, TFT_BLUE);
+				hGraph1->ID=Ghand1;
+				Graph->redraw(Ghand1);
 				text->Draw(0,postext);
 			}
 		}
@@ -233,8 +282,9 @@ void System::handler(Device::Hardware::t_Data * data){
 			if(rvalue==0){
 				postext--;//else postext--;
 
-				Graph->fillRect(hGraph->position.x, hGraph->position.y, hGraph->size.width, hGraph->size.height, TFT_BLUE);
-				Graph->redraw(hGraph);
+				Graph->fillRect(hGraph1->position.x, hGraph1->position.y, hGraph1->size.width, hGraph1->size.height, TFT_BLUE);
+				hGraph1->ID=Ghand1;
+				Graph->redraw(Ghand1);
 				text->Draw(0,postext);
 			}
 		}
@@ -242,11 +292,53 @@ void System::handler(Device::Hardware::t_Data * data){
 
 	}
 
+	if (data->pin == GPIO26){
+
+		//if(rvalue != HW_DI_lastvalue_GPIO0){
+			if(rvalue==0)
+				DItext->setText("false");
+			else
+				DItext->setText("true");
+			Graph->fillRect(hGraph2->position.x, hGraph2->position.y, hGraph2->size.width, hGraph2->size.height, TFT_BLUE);
+			hGraph2->ID=Ghand2;
+			Graph->redraw(Ghand2);
+			DItext->Draw();
+
+		//}
+		//HW_DI_lastvalue_GPIO0=rvalue;
+
+	}
+	if (data->pin == GPIO27){
+
+		//if(rvalue != HW_DI_lastvalue_GPIO0){
+			//if(rvalue==0)
+		std::string tmp_ss = std::to_string(rvalue);
+		//char const *pchar = tmp_ss.c_str();
+				AItext->setText((char const *)tmp_ss.c_str());
+			//else
+			//	DItext->setText("true");
+			Graph->fillRect(hGraph3->position.x, hGraph3->position.y, hGraph3->size.width, hGraph3->size.height, TFT_BLUE);
+			hGraph3->ID=Ghand3;
+			Graph->redraw(Ghand3);
+			DItext->Draw();
+
+		//}
+		//HW_DI_lastvalue_GPIO0=rvalue;
+
+	}
 
 
 }
 
 void System::hGraphics(Device::Display::Graphics::t_Graphics * data) {
-
+	if(data->ID != Ghand1){
+		text->Draw(0,postext);
+	}
+	if(data->ID != Ghand2){
+		DItext->Draw();
+	}
+	if(data->ID != Ghand3){
+		AItext->Draw();
+	}
 }
 
