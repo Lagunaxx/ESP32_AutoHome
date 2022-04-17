@@ -10,7 +10,7 @@
 		TextBlock *text;
 		TextBlock *AItext;
 		TextBlock *DItext;
-		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext;
+		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext, HW_DI_lastvalue_GPIO26, HW_DI_lastvalue_GPIO27;
 		Device::Display::Graphics::t_Graphics *hGraph1, *hGraph2, *hGraph3;
 		uint8_t Ghand1, Ghand2, Ghand3;
 
@@ -60,6 +60,8 @@ System::System() {
 	DItext=new(TextBlock);
 	HW_DI_lastvalue_GPIO0=1;
 	HW_DI_lastvalue_GPIO35=1;
+	HW_DI_lastvalue_GPIO26=1;
+	HW_DI_lastvalue_GPIO27=4095;
 	postext = 0;
 
 }
@@ -294,36 +296,32 @@ void System::handler(Device::Hardware::t_Data * data){
 
 	if (data->pin == GPIO26){
 
-		//if(rvalue != HW_DI_lastvalue_GPIO0){
+		if(rvalue != HW_DI_lastvalue_GPIO26){
 			if(rvalue==0)
 				DItext->setText("false");
 			else
 				DItext->setText("true");
-			Graph->fillRect(hGraph2->position.x, hGraph2->position.y, hGraph2->size.width, hGraph2->size.height, TFT_BLUE);
-			hGraph2->ID=Ghand2;
-			Graph->redraw(Ghand2);
-			DItext->Draw();
-
-		//}
-		//HW_DI_lastvalue_GPIO0=rvalue;
-
-	}
-	if (data->pin == GPIO27){
-
-		//if(rvalue != HW_DI_lastvalue_GPIO0){
-			//if(rvalue==0)
-		std::string tmp_ss = std::to_string(rvalue);
-		//char const *pchar = tmp_ss.c_str();
-				AItext->setText((char const *)tmp_ss.c_str());
-			//else
-			//	DItext->setText("true");
 			Graph->fillRect(hGraph3->position.x, hGraph3->position.y, hGraph3->size.width, hGraph3->size.height, TFT_BLUE);
-			hGraph3->ID=Ghand3;
+//			hGraph3->ID=Ghand3;
 			Graph->redraw(Ghand3);
 			DItext->Draw();
 
-		//}
-		//HW_DI_lastvalue_GPIO0=rvalue;
+		}
+		HW_DI_lastvalue_GPIO26=rvalue;
+
+	}
+	if (data->pin == GPIO27){
+		rvalue = ((4095 - rvalue)>>4)*100/255;
+		if(rvalue != HW_DI_lastvalue_GPIO27){
+		std::string tmp_ss = std::to_string(rvalue);
+				AItext->setText((char const *)tmp_ss.c_str());
+			Graph->fillRect(hGraph2->position.x, hGraph2->position.y, hGraph2->size.width, hGraph2->size.height, TFT_BLUE);
+//			hGraph2->ID=Ghand2;
+			Graph->redraw(Ghand2);
+			AItext->Draw();
+
+		}
+		HW_DI_lastvalue_GPIO27=rvalue;
 
 	}
 
