@@ -53,28 +53,6 @@ System::System() {
 	Device::Hardware::Bus->addAI(GPIO27, &System::handler);
 
 	hGraph1 = new(Device::Display::Graphics::t_Graphics);
-/*	hGraph2 = new(Device::Display::Graphics::t_Graphics);
-	hGraph3 = new(Device::Display::Graphics::t_Graphics);
-	hGraph1->ID=220;
-	hGraph1->position.x=5;
-	hGraph1->position.y=20;
-	hGraph1->size.width=85;
-	hGraph1->size.height=110;
-	hGraph1->callbackHandler=&System::hGraphics;
-	Ghand1 = Graph->registerHandler(hGraph1); // For GPIO35 and GPIO0
-	hGraph2->position.x=10;
-	hGraph2->position.y=130;
-	hGraph2->size.width=85;
-	hGraph2->size.height=16;
-	hGraph2->callbackHandler=&System::hGraphics;
-	Ghand2= Graph->registerHandler(hGraph2); // For GPIO26
-	hGraph3->position.x=10;
-	hGraph3->position.y=150;
-	hGraph3->size.width=85;
-	hGraph3->size.height=16;
-	hGraph3->callbackHandler=&System::hGraphics;
-	Ghand3 = Graph->registerHandler(hGraph3); // For GPIO27
-*/
 	hGraph1->ID=0;
 	hGraph1->position.x=5;
 	hGraph1->position.y=20;
