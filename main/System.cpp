@@ -11,16 +11,17 @@
 		TextBlock *AItext;
 		TextBlock *DItext;
 		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext, HW_DI_lastvalue_GPIO26, HW_DI_lastvalue_GPIO27;
-		Device::Display::Graphics::t_Graphics *hGraph1;//, *hGraph2, *hGraph3;
+		Device::Display::Graphics::t_Graphics *hGraph1;
 		uint8_t Ghand1, Ghand2, Ghand3;
 
 
 System::System() {
 	// TODO Auto-generated constructor stub
+
 #ifdef FTP_SERVERESP_H
 	//FTP_Server = new Service::FTP::FtpServer();
-//	upng = 0;
 #endif
+
 	Device::Display::init();
 	Device::Display::Graphics::init(TFT_BLUE);
 	Fonts=new Device::Display::Graphics::Font();
