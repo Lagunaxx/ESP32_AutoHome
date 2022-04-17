@@ -53,28 +53,34 @@ System::System() {
 	Device::Hardware::Bus->addDI(GPIO26, &System::handler);
 	Device::Hardware::Bus->addAI(GPIO27, &System::handler);
 
-	text->setSymbolSpace(2);
-	text->setTextFont(2);
-	text->setTextSize(1);
-	text->setText("moisture:");
 	hGraph1 = new(Device::Display::Graphics::t_Graphics);
 	hGraph1->ID=0;
 	hGraph1->position.x=5;
 	hGraph1->position.y=20;
-	hGraph1->size.width=text->getWidth();
-	hGraph1->size.height=text->fontHeight();
+	hGraph1->size.width=85;
+	hGraph1->size.height=110;
 	hGraph1->callbackHandler=&System::hGraphics;
 	Ghand1 = Graph->registerHandler(hGraph1); // For GPIO35 and GPIO0
 	text->setBGColor(bgcolor);
 	text->setFGColor(fgcolor);
-	text->setPosition(hGraph1->position.x, hGraph1->position.y=20);
-	text->setSize(hGraph1->size.width, text->height());
+	text->setPosition(boxcords.x, boxcords.y);
+	text->setSize(boxsize.width, boxsize.height);
 	text->setLineSpace(3);
+	text->setSymbolSpace(2);
+	text->setTextFont(2);
 	text->setTextColor(TFT_WHITE,TFT_BLUE);
+	text->setTextSize(1);
 	text->setMoveWholeWord(true);
 	text->setSkipFistSpace(true);
+	text->setText("  hblahblah   that is fun, that text do not fit all blocxk. and errors in text");
 
-
+	hGraph1->position.x=10;
+	hGraph1->position.y=130;
+	hGraph1->size.width=85;
+	hGraph1->size.height=16;
+	Ghand2= Graph->registerHandler(hGraph1); // For GPIO26
+	AItext->setPosition(hGraph1->position.x, hGraph1->position.y);
+	AItext->setSize(hGraph1->size.width, hGraph1->size.height);
 	AItext->setBGColor(bgcolor);
 	AItext->setFGColor(fgcolor);
 	AItext->setLineSpace(3);
@@ -84,17 +90,15 @@ System::System() {
 	AItext->setTextSize(1);
 	AItext->setMoveWholeWord(true);
 	AItext->setSkipFistSpace(true);
-	AItext->setText("N\\A ");
-	hGraph1->position.x=text->getPosition().x + text->getWidth()+2;
-	hGraph1->position.y=text->getPosition().y;
-	hGraph1->size.width=AItext->getWidth();
-	hGraph1->size.height=AItext->fontHeight();
-	Ghand2= Graph->registerHandler(hGraph1); // For GPIO26
-	AItext->setPosition(hGraph1->position.x, hGraph1->position.y);
-	AItext->setSize(hGraph1->size.width, hGraph1->size.height);
+	AItext->setText("N\\A");
 
-
-
+	hGraph1->position.x=10;
+	hGraph1->position.y=150;
+	hGraph1->size.width=85;
+	hGraph1->size.height=16;
+	Ghand3 = Graph->registerHandler(hGraph1); // For GPIO27
+	DItext->setPosition(hGraph1->position.x, hGraph1->position.y);
+	DItext->setSize(hGraph1->size.width, hGraph1->size.height);
 	DItext->setBGColor(bgcolor);
 	DItext->setFGColor(fgcolor);
 	DItext->setLineSpace(3);
@@ -104,14 +108,7 @@ System::System() {
 	DItext->setTextSize(1);
 	DItext->setMoveWholeWord(true);
 	DItext->setSkipFistSpace(true);
-	DItext->setText("false");
-	hGraph1->position.x=10;
-	hGraph1->position.y=150;
-	hGraph1->size.width=DItext->getWidth();
-	hGraph1->size.height=DItext->fontHeight();
-	Ghand3 = Graph->registerHandler(hGraph1); // For GPIO27
-	DItext->setPosition(hGraph1->position.x, hGraph1->position.y);
-	DItext->setSize(hGraph1->size.width, hGraph1->size.height);
+	DItext->setText("N\\A");
 
 
 
