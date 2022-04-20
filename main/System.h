@@ -35,7 +35,7 @@
 
 	#include "Extensions/cBuffer.h"
 	#include "Extensions/TextBlock.h"
-	#include "Extensions/Hardware/Hardware.h"
+	#include "ESP32_System.h"
 
 //	#include <SPI.h>
 //	#include <ESPmDNS.h>

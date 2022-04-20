@@ -172,6 +172,12 @@ CONFIG_SPIDISPLAY_ARDUHAL_LOG_DEFAULT_LEVEL=1
 # end of SPI Display
 
 #
+# ESP32_System
+#
+CONFIG_ESP32_SYSTEM_DI=y
+# end of ESP32_System
+
+#
 # Arduino Configuration
 #
 CONFIG_ENABLE_ARDUINO_DEPENDS=y
