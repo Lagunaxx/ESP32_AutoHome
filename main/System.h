@@ -36,6 +36,8 @@
 	#include "Extensions/cBuffer.h"
 	#include "Extensions/TextBlock.h"
 	#include "ESP32_System.h"
+#include "Extensions/Network/wifi/WiFi.h"
+#include "Extensions/IO.h"
 
 //	#include <SPI.h>
 //	#include <ESPmDNS.h>

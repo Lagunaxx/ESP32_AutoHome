@@ -13,10 +13,12 @@
 		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext, HW_DI_lastvalue_GPIO26, HW_DI_lastvalue_GPIO27;
 		Device::Display::Graphics::t_Graphics *hGraph1;
 		uint8_t Ghand1, Ghand2, Ghand3;
+		Device::Hardware::class_IO * io;
 
 
 System::System() {
 	// TODO Auto-generated constructor stub
+
 
 #ifdef FTP_SERVERESP_H
 	//FTP_Server = new Service::FTP::FtpServer();
@@ -30,6 +32,7 @@ System::System() {
 	AItext=new(TextBlock);
 	DItext=new(TextBlock);
 	Device::Hardware::init();
+	io = new(Device::Hardware::class_IO);
 
 	Device::Display::Graphics::t_Coordinate2D 	boxcords;
 	Device::Display::Graphics::t_Size2D			boxsize;
@@ -48,10 +51,9 @@ System::System() {
 	boxsize.height = 110;
 
 
-	Device::Hardware::Bus->addDI(GPIO35, &System::handler);
-	Device::Hardware::Bus->addDI(GPIO0, &System::handler);
-	Device::Hardware::Bus->addDI(GPIO26, &System::handler);
-	Device::Hardware::Bus->addAI(GPIO27, &System::handler);
+//	Device::Hardware::Bus->addDI(GPIO0, &System::handler);
+//	Device::Hardware::Bus->addDI(GPIO26, &System::handler);
+//	Device::Hardware::Bus->addAI(GPIO35, &System::handler);
 
 	text->setSymbolSpace(2);
 	text->setTextFont(2);
