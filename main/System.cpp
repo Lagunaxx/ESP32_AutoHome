@@ -51,8 +51,9 @@ System::System() {
 	boxsize.height = 110;
 
 
-//	Device::Hardware::Bus->addDI(GPIO0, &System::handler);
-//	Device::Hardware::Bus->addDI(GPIO26, &System::handler);
+	io->addDI(GPIO0, &System::handler);
+	io->addDI(GPIO35, &System::handler);
+//	io->addDI(GPIO26, &System::handler);
 //	Device::Hardware::Bus->addAI(GPIO35, &System::handler);
 
 	text->setSymbolSpace(2);
