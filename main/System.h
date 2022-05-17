@@ -39,6 +39,10 @@
 #include "Extensions/Network/wifi/WiFi.h"
 #include "Extensions/IO.h"
 
+
+// ToDo: remove
+#include "Extensions/Network/Protocols/IPv4.h"
+
 //	#include <SPI.h>
 //	#include <ESPmDNS.h>
 
@@ -65,7 +69,7 @@
 
 	#define TFT_GREY 0x5AEB // New colour
 
-#ifdef GRAPH_PNG
+#ifdef CONFIG_ESP32_SPIDISPLAY_GRAPHICS_PNG
 	#include "upng.h"
 	using Device::Display::uPNG::uPNG;
 #endif
@@ -130,6 +134,8 @@ class System {
 		handler_type handler(Device::Hardware::t_Data * data); //defining by user for Hardware usage
 		handler_type hGraphics(Device::Display::Graphics::t_Graphics * data);
 		//void InitFS();
+
+	    static tcpip_adapter_ip_info_t ip;
 
 	};
 

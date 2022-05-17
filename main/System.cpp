@@ -4,8 +4,133 @@
  *  Created on: 13 сент. 2019 г.
  *      Author: producer
  */
-
 #include "System.h"
+
+
+#include "nvs_flash.h"
+#define DEFAULT_SCAN_LIST_SIZE 10
+
+static const char *TAG = "scan";
+
+static void print_auth_mode(int authmode)
+{
+    switch (authmode) {
+    case WIFI_AUTH_OPEN:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_OPEN");
+        break;
+    case WIFI_AUTH_WEP:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WEP");
+        break;
+    case WIFI_AUTH_WPA_PSK:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WPA_PSK");
+        break;
+    case WIFI_AUTH_WPA2_PSK:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WPA2_PSK");
+        break;
+    case WIFI_AUTH_WPA_WPA2_PSK:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WPA_WPA2_PSK");
+        break;
+    case WIFI_AUTH_WPA2_ENTERPRISE:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WPA2_ENTERPRISE");
+        break;
+    case WIFI_AUTH_WPA3_PSK:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WPA3_PSK");
+        break;
+    case WIFI_AUTH_WPA2_WPA3_PSK:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_WPA2_WPA3_PSK");
+        break;
+    default:
+        ESP_LOGI(TAG, "Authmode \tWIFI_AUTH_UNKNOWN");
+        break;
+    }
+}
+
+static void print_cipher_type(int pairwise_cipher, int group_cipher)
+{
+    switch (pairwise_cipher) {
+    case WIFI_CIPHER_TYPE_NONE:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_NONE");
+        break;
+    case WIFI_CIPHER_TYPE_WEP40:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_WEP40");
+        break;
+    case WIFI_CIPHER_TYPE_WEP104:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_WEP104");
+        break;
+    case WIFI_CIPHER_TYPE_TKIP:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_TKIP");
+        break;
+    case WIFI_CIPHER_TYPE_CCMP:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_CCMP");
+        break;
+    case WIFI_CIPHER_TYPE_TKIP_CCMP:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_TKIP_CCMP");
+        break;
+    default:
+        ESP_LOGI(TAG, "Pairwise Cipher \tWIFI_CIPHER_TYPE_UNKNOWN");
+        break;
+    }
+
+    switch (group_cipher) {
+    case WIFI_CIPHER_TYPE_NONE:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_NONE");
+        break;
+    case WIFI_CIPHER_TYPE_WEP40:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_WEP40");
+        break;
+    case WIFI_CIPHER_TYPE_WEP104:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_WEP104");
+        break;
+    case WIFI_CIPHER_TYPE_TKIP:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_TKIP");
+        break;
+    case WIFI_CIPHER_TYPE_CCMP:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_CCMP");
+        break;
+    case WIFI_CIPHER_TYPE_TKIP_CCMP:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_TKIP_CCMP");
+        break;
+    default:
+        ESP_LOGI(TAG, "Group Cipher \tWIFI_CIPHER_TYPE_UNKNOWN");
+        break;
+    }
+}
+
+/* Initialize Wi-Fi as sta and set scan method */
+static void wifi_scan(void)
+{
+    ESP_ERROR_CHECK(esp_netif_init());
+    //ESP_ERROR_CHECK(esp_event_loop_create_default());
+    //esp_netif_t *sta_netif = esp_netif_create_default_wifi_sta();
+    //assert(sta_netif);
+
+    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
+
+    uint16_t number = DEFAULT_SCAN_LIST_SIZE;
+    wifi_ap_record_t ap_info[DEFAULT_SCAN_LIST_SIZE];
+    uint16_t ap_count = 0;
+    memset(ap_info, 0, sizeof(ap_info));
+
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_start());
+    esp_wifi_scan_start(NULL, true);
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_records(&number, ap_info));
+    ESP_ERROR_CHECK(esp_wifi_scan_get_ap_num(&ap_count));
+    ESP_LOGI(TAG, "Total APs scanned = %u", ap_count);
+    for (int i = 0; (i < DEFAULT_SCAN_LIST_SIZE) && (i < ap_count); i++) {
+        ESP_LOGI(TAG, "SSID \t\t%s", ap_info[i].ssid);
+        ESP_LOGI(TAG, "RSSI \t\t%d", ap_info[i].rssi);
+        print_auth_mode(ap_info[i].authmode);
+        if (ap_info[i].authmode != WIFI_AUTH_WEP) {
+            print_cipher_type(ap_info[i].pairwise_cipher, ap_info[i].group_cipher);
+        }
+        ESP_LOGI(TAG, "Channel \t\t%d\n", ap_info[i].primary);
+    }
+
+}
+
+
 
 		TextBlock *text;
 		TextBlock *AItext;
@@ -13,7 +138,7 @@
 		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext, HW_DI_lastvalue_GPIO26, HW_DI_lastvalue_GPIO27;
 		Device::Display::Graphics::t_Graphics *hGraph1;
 		uint8_t Ghand1, Ghand2, Ghand3;
-		Device::Hardware::class_IO * io;
+		tcpip_adapter_ip_info_t System::ip;
 
 
 System::System() {
@@ -32,7 +157,14 @@ System::System() {
 	AItext=new(TextBlock);
 	DItext=new(TextBlock);
 	Device::Hardware::init();
-	io = new(Device::Hardware::class_IO);
+	Device::Hardware::IO_init();
+#ifndef WiFiClientSecure_h
+	Device::Hardware::Network::WiFi_init();
+	//Device::Hardware::Network::WiFi->startSTA();
+	//Device::Hardware::Network::WiFi->startAP();
+#endif
+    memset(&ip, 0, sizeof(esp_netif_ip_info_t));
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
 
 	Device::Display::Graphics::t_Coordinate2D 	boxcords;
 	Device::Display::Graphics::t_Size2D			boxsize;
@@ -51,8 +183,8 @@ System::System() {
 	boxsize.height = 110;
 
 
-	io->addDI(GPIO0, &System::handler);
-	io->addDI(GPIO35, &System::handler);
+	Device::Hardware::IO->addDI(GPIO0, &System::handler);
+	Device::Hardware::IO->addDI(GPIO35, &System::handler);
 //	io->addDI(GPIO26, &System::handler);
 //	Device::Hardware::Bus->addAI(GPIO35, &System::handler);
 
@@ -190,7 +322,7 @@ void System::WFAPInit() {
 #include "../../wf.pass"
 
 	//contains initialization for ssid and password for wifi
-	WiFi.begin(ssid, password);
+	WiFi.begin(CONFIG_ESP32_SYSTEM_HW_NETWORK_WIFI_STA_SSID,CONFIG_ESP32_SYSTEM_HW_NETWORK_WIFI_STA_PASSWORD);//ssid, password);
 
 	// attempt to connect to Wifi network:
 	while (WiFi.status() != WL_CONNECTED) {
@@ -231,7 +363,7 @@ void System::DrawPng() {
 
 
 	for (int numfiles = 0; numfiles < maxfiles; numfiles++) {
-#ifdef GRAPH_PNG
+#ifdef CONFIG_ESP32_SPIDISPLAY_GRAPHICS_PNG
 		Device::Display::uPNG::uPNG->DrawFile(filenames[numfiles], 80, 100);
 #endif
 		//Fonts->setFreeFont(&Device::Display::Graphics::FreeMono9pt7b);
@@ -268,13 +400,21 @@ void System::handler(Device::Hardware::t_Data * data){
 
 		if(rvalue != HW_DI_lastvalue_GPIO35){
 			if(rvalue==0){
-				postext++;//else postext--;
+		        if (Device::Hardware::Network::WiFi->getAPIPInfo(&ip)){//esp_netif_get_ip_info(Device::Hardware::Network::class_WiFi::ap_netif, &ip) == 0) {
+		            ESP_LOGW("System", "~~~~~~~~~~~");
+		            ESP_LOGW("System", "IP:"IPSTR, IP2STR(&ip.ip));
+		            ESP_LOGW("System", "MASK:"IPSTR, IP2STR(&ip.netmask));
+		            ESP_LOGW("System", "GW:"IPSTR, IP2STR(&ip.gw));
+		            ESP_LOGW("System", "~~~~~~~~~~~");
+		        }
+
+	//			postext++;//else postext--;
 
 //				Graph->fillRect(hGraph1->position.x, hGraph1->position.y, hGraph1->size.width, hGraph1->size.height, TFT_BLUE);
-				text->Clear();
-				hGraph1->ID=Ghand1;
-				Graph->redraw(Ghand1);
-				text->Draw(0,postext);
+	//			text->Clear();
+	//			hGraph1->ID=Ghand1;
+	//			Graph->redraw(Ghand1);
+	//			text->Draw(0,postext);
 			}
 		}
 		HW_DI_lastvalue_GPIO35=rvalue;
@@ -283,13 +423,23 @@ void System::handler(Device::Hardware::t_Data * data){
 
 		if(rvalue != HW_DI_lastvalue_GPIO0){
 			if(rvalue==0){
-				postext--;//else postext--;
+
+		        if (Device::Hardware::Network::WiFi->getSTAIPInfo(&ip)) {
+		            ESP_LOGW("System", "~~~~~~~~~~~");
+		            ESP_LOGW("System", "IP:"IPSTR, IP2STR(&ip.ip));
+		            ESP_LOGW("System", "MASK:"IPSTR, IP2STR(&ip.netmask));
+		            ESP_LOGW("System", "GW:"IPSTR, IP2STR(&ip.gw));
+		            ESP_LOGW("System", "~~~~~~~~~~~");
+		        }
+
+
+	//			postext--;//else postext--;
 
 //				Graph->fillRect(hGraph1->position.x, hGraph1->position.y, hGraph1->size.width, hGraph1->size.height, TFT_BLUE);
-				text->Clear();
-				hGraph1->ID=Ghand1;
-				Graph->redraw(Ghand1);
-				text->Draw(0,postext);
+	//			text->Clear();
+	//			hGraph1->ID=Ghand1;
+	//			Graph->redraw(Ghand1);
+	//			text->Draw(0,postext);
 			}
 		}
 		HW_DI_lastvalue_GPIO0=rvalue;
@@ -343,4 +493,6 @@ void System::hGraphics(Device::Display::Graphics::t_Graphics * data) {
 		AItext->Draw();
 	}
 }
+
+
 
