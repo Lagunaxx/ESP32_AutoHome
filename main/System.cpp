@@ -138,7 +138,12 @@ static void wifi_scan(void)
 		unsigned int HW_DI_lastvalue_GPIO35, HW_DI_lastvalue_GPIO0, postext, HW_DI_lastvalue_GPIO26, HW_DI_lastvalue_GPIO27;
 		Device::Display::Graphics::t_Graphics *hGraph1;
 		uint8_t Ghand1, Ghand2, Ghand3;
+
 		tcpip_adapter_ip_info_t System::ip;
+		TextBlock *IPlistHeader;
+		TextBlock *STAinfo;
+		TextBlock *APinfo;
+		uint8_t h_IPlistHeader, handlerSTAlist, handlerAPlist;
 
 
 System::System() {
@@ -153,9 +158,11 @@ System::System() {
 	Device::Display::Graphics::init(TFT_BLUE);
 	Fonts=new Device::Display::Graphics::Font();
 	Fonts->setTextColor(0x000000);
+
 	text=new(TextBlock);
 	AItext=new(TextBlock);
 	DItext=new(TextBlock);
+
 	Device::Hardware::init();
 	Device::Hardware::IO_init();
 #ifndef WiFiClientSecure_h
@@ -191,7 +198,7 @@ System::System() {
 	text->setSymbolSpace(2);
 	text->setTextFont(2);
 	text->setTextSize(1);
-	text->setText("moisture:");
+	text->setText("moisture:\nas\nasd asdf");
 	hGraph1 = new(Device::Display::Graphics::t_Graphics);
 	hGraph1->ID=0;
 	hGraph1->position.x=5;
@@ -256,6 +263,50 @@ System::System() {
 	HW_DI_lastvalue_GPIO27=4095;
 	postext = 0;
 
+
+
+	// Next part of code initializes TextBlocks for STAlist information
+	STAinfo=new(TextBlock);
+	IPlistHeader=new(TextBlock);
+
+
+	//STAinfo->setBGColor(bgcolor);
+	//STAinfo->setFGColor(fgcolor);
+	STAinfo->setLineSpace(2);
+	STAinfo->setSymbolSpace(1);
+	STAinfo->setTextFont(2);
+	STAinfo->setTextColor(TFT_WHITE,TFT_BLUE);
+	STAinfo->setTextSize(1);
+	STAinfo->setMoveWholeWord(true);
+	STAinfo->setSkipFistSpace(true);
+	STAinfo->setText("");
+	STAinfo->setSize(Graph->width(), (STAinfo->fontHeight()+1)*8);
+	STAinfo->setPosition(0, STAinfo->fontHeight()+1);
+	hGraph1->position.x=STAinfo->getPosition().x;
+	hGraph1->position.y=STAinfo->getPosition().y;
+	hGraph1->size.width=STAinfo->getWidth();
+	hGraph1->size.height=STAinfo->fontHeight();
+	handlerSTAlist= Graph->registerHandler(hGraph1);
+
+	IPlistHeader->setLineSpace(0);
+	IPlistHeader->setSymbolSpace(1);
+	IPlistHeader->setTextFont(2);
+	IPlistHeader->setTextColor(TFT_WHITE,TFT_BLUE);
+	IPlistHeader->setTextSize(1);
+	IPlistHeader->setMoveWholeWord(true);
+	IPlistHeader->setSkipFistSpace(true);
+	IPlistHeader->setText("");
+	IPlistHeader->setSize(Graph->width(), IPlistHeader->fontHeight()+1);
+	IPlistHeader->setPosition(0, 1);
+	hGraph1->position.x=IPlistHeader->getPosition().x;
+	hGraph1->position.y=IPlistHeader->getPosition().y;
+	hGraph1->size.width=IPlistHeader->getWidth();
+	hGraph1->size.height=IPlistHeader->fontHeight();
+	h_IPlistHeader = Graph->registerHandler(hGraph1);
+
+
+	// Next block for APlist information
+	APinfo=new(TextBlock);
 }
 
 System::~System() {
@@ -357,10 +408,12 @@ void System::DrawPng() {
 	//const char *texttext = "hblahblah that is fun, that text do not fit all blocxk. and errors in text";
 	//t_DispCoords hbox = 53;
 
-	AItext->Draw();
+//	AItext->Draw();
 
-	DItext->Draw();
+//	DItext->Draw();
 
+    //IPlistHeader->setText("Client list:");
+    IPlistHeader->Draw();
 
 	for (int numfiles = 0; numfiles < maxfiles; numfiles++) {
 #ifdef CONFIG_ESP32_SPIDISPLAY_GRAPHICS_PNG
@@ -386,9 +439,57 @@ void System::DrawPng() {
 */		Serial.printf("Text->Draw()\n");
 //		text->drawString(string, 2, 2);
 //		Fonts->drawNumber((long int)text->textWidthFit(string,2,hbox), 52, 180);
-		text->Draw();
+//		text->Draw();
+//		STAinfo->Draw();
 
 	}
+}
+
+void System::InitModbus(){
+	mbtcp=new(Device::Hardware::Modbus_TCP);
+
+	mbtcp->initializeParameters(7);
+
+	bool b_result = mbtcp->createParam(0, CID_INP_DATA_0, STR("Data_channel_0"), STR("Volts"), MB_DEVICE_ADDR1, MB_PARAM_INPUT, 0, 2,
+            INPUT_OFFSET(input_data0),
+			PARAM_TYPE_FLOAT, 4,
+			OPTS( -10, 10, 1 ),
+			PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(1, CID_HOLD_DATA_0, STR("Humidity_1"), STR("%rH"), MB_DEVICE_ADDR1, MB_PARAM_HOLDING, 0, 2,\
+            HOLD_OFFSET(holding_data0), PARAM_TYPE_FLOAT, 4, OPTS( 0, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(2, CID_INP_DATA_1, STR("Temperature_1"), STR("C"), MB_DEVICE_ADDR1, MB_PARAM_INPUT, 2, 2,\
+            INPUT_OFFSET(input_data1), PARAM_TYPE_FLOAT, 4, OPTS( -40, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(3, CID_HOLD_DATA_1, STR("Humidity_2"), STR("%rH"), MB_DEVICE_ADDR1, MB_PARAM_HOLDING, 2, 2,\
+            HOLD_OFFSET(holding_data1), PARAM_TYPE_FLOAT, 4, OPTS( 0, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(4, CID_INP_DATA_2, STR("Temperature_2"), STR("C"), MB_DEVICE_ADDR1, MB_PARAM_INPUT, 4, 2,\
+            INPUT_OFFSET(input_data2), PARAM_TYPE_FLOAT, 4, OPTS( -40, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(5, CID_HOLD_DATA_2, STR("Humidity_3"), STR("%rH"), MB_DEVICE_ADDR1, MB_PARAM_HOLDING, 4, 2,\
+            HOLD_OFFSET(holding_data2), PARAM_TYPE_FLOAT, 4, OPTS( 0, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(6, CID_RELAY_P1, STR("RelayP1"), STR("on/off"), MB_DEVICE_ADDR1, MB_PARAM_COIL, 0, 8,\
+            COIL_OFFSET(coils_port0), PARAM_TYPE_U16, 2, OPTS( BIT1, 0, 0 ), PAR_PERMS_READ_WRITE_TRIGGER);
+	b_result = mbtcp->createParam(7, CID_RELAY_P2, STR("RelayP2"), STR("on/off"), MB_DEVICE_ADDR1, MB_PARAM_COIL, 8, 8,\
+            COIL_OFFSET(coils_port1), PARAM_TYPE_U16, 2, OPTS( BIT0, 0, 0 ), PAR_PERMS_READ_WRITE_TRIGGER);
+//	b_result = mbtcp->createParam(8, );
+    // { CID, Param Name, Units, Modbus Slave Addr, Modbus Reg Type, Reg Start, Reg Size, Instance Offset, Data Type, Data Size, Parameter Options, Access Mode}
+/*
+//     { CID_INP_DATA_0, STR("Data_channel_0"), STR("Volts"), MB_DEVICE_ADDR1, MB_PARAM_INPUT, 0, 2,
+                    INPUT_OFFSET(input_data0), PARAM_TYPE_FLOAT, 4, OPTS( -10, 10, 1 ), PAR_PERMS_READ_WRITE_TRIGGER },
+//    { CID_HOLD_DATA_0, STR("Humidity_1"), STR("%rH"), MB_DEVICE_ADDR1, MB_PARAM_HOLDING, 0, 2,
+            HOLD_OFFSET(holding_data0), PARAM_TYPE_FLOAT, 4, OPTS( 0, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER },
+//    { CID_INP_DATA_1, STR("Temperature_1"), STR("C"), MB_DEVICE_ADDR1, MB_PARAM_INPUT, 2, 2,
+            INPUT_OFFSET(input_data1), PARAM_TYPE_FLOAT, 4, OPTS( -40, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER },
+//    { CID_HOLD_DATA_1, STR("Humidity_2"), STR("%rH"), MB_DEVICE_ADDR1, MB_PARAM_HOLDING, 2, 2,
+            HOLD_OFFSET(holding_data1), PARAM_TYPE_FLOAT, 4, OPTS( 0, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER },
+4    { CID_INP_DATA_2, STR("Temperature_2"), STR("C"), MB_DEVICE_ADDR1, MB_PARAM_INPUT, 4, 2,
+            INPUT_OFFSET(input_data2), PARAM_TYPE_FLOAT, 4, OPTS( -40, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER },
+5    { CID_HOLD_DATA_2, STR("Humidity_3"), STR("%rH"), MB_DEVICE_ADDR1, MB_PARAM_HOLDING, 4, 2,
+            HOLD_OFFSET(holding_data2), PARAM_TYPE_FLOAT, 4, OPTS( 0, 100, 1 ), PAR_PERMS_READ_WRITE_TRIGGER },
+6    { CID_RELAY_P1, STR("RelayP1"), STR("on/off"), MB_DEVICE_ADDR1, MB_PARAM_COIL, 0, 8,
+            COIL_OFFSET(coils_port0), PARAM_TYPE_U16, 2, OPTS( BIT1, 0, 0 ), PAR_PERMS_READ_WRITE_TRIGGER },
+7    { CID_RELAY_P2, STR("RelayP2"), STR("on/off"), MB_DEVICE_ADDR1, MB_PARAM_COIL, 8, 8,
+            COIL_OFFSET(coils_port1), PARAM_TYPE_U16, 2, OPTS( BIT0, 0, 0 ), PAR_PERMS_READ_WRITE_TRIGGER }
+*/
+
 }
 
 void System::handler(Device::Hardware::t_Data * data){
@@ -408,13 +509,46 @@ void System::handler(Device::Hardware::t_Data * data){
 		            ESP_LOGW("System", "~~~~~~~~~~~");
 		        }
 
+
+		        wifi_sta_list_t stalist;
+		        tcpip_adapter_sta_list_t ipInfoList;
+		        if (Device::Hardware::Network::WiFi->STAlist(&stalist)){
+		        	if (Device::Hardware::Network::WiFi->STAlistIPInfo(&stalist, &ipInfoList)){
+			        	char textContent[256] = {0,};
+			        	memset(&textContent,0,256);
+			        	char tmp[17] = {0,};
+			        	int tmp_pos = 0;
+
+			        	IPlistHeader->setText("Client list:");
+			        	IPlistHeader->Clear();
+			        	IPlistHeader->Draw();
+
+			        	for (int tmp_num=0; tmp_num<ipInfoList.num;tmp_num++) {
+
+			        		snprintf(tmp, 17, IPSTR"\n",IP2STR(&ipInfoList.sta[tmp_num].ip));
+			        		memcpy(&textContent[tmp_pos],&tmp,strlen(tmp) );
+							tmp_pos += strlen(tmp) + 1;
+			        	}
+
+
+			        	STAinfo->Clear();
+			        	STAinfo->setText(textContent);
+			        	STAinfo->Draw();
+		        	}
+
+
+
+		        	//text->setText(textContent);
+
+		        }
+
 	//			postext++;//else postext--;
 
 //				Graph->fillRect(hGraph1->position.x, hGraph1->position.y, hGraph1->size.width, hGraph1->size.height, TFT_BLUE);
-	//			text->Clear();
+				//text->Clear();
 	//			hGraph1->ID=Ghand1;
-	//			Graph->redraw(Ghand1);
-	//			text->Draw(0,postext);
+		        //Graph->redraw(Ghand1);
+				//text->Draw(0,postext);
 			}
 		}
 		HW_DI_lastvalue_GPIO35=rvalue;
@@ -484,13 +618,17 @@ void System::handler(Device::Hardware::t_Data * data){
 
 void System::hGraphics(Device::Display::Graphics::t_Graphics * data) {
 	if(data->ID != Ghand1){
-		text->Draw(0,postext);
+		//text->Draw(0,postext);
 	}
 	if(data->ID != Ghand2){
-		DItext->Draw();
+	//	DItext->Draw();
 	}
 	if(data->ID != Ghand3){
-		AItext->Draw();
+	//	AItext->Draw();
+	}
+
+	if(data->ID !=h_IPlistHeader){
+		IPlistHeader->Draw();
 	}
 }
 

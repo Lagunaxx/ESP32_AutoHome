@@ -29,6 +29,8 @@
 	#include "Graphics.h"
 	#include "Touch.h"
 
+#include <esp_modbus_master.h>
+
 #include "Font.h"
 
 	#include "Types.h"
@@ -38,6 +40,8 @@
 	#include "ESP32_System.h"
 #include "Extensions/Network/wifi/WiFi.h"
 #include "Extensions/IO.h"
+
+#include <string.h>
 
 
 // ToDo: remove
@@ -128,6 +132,11 @@ class System {
 
 		System();
 		virtual ~System();
+
+
+
+		void InitModbus();
+		Device::Hardware::Modbus_TCP *mbtcp;
 
 
 
